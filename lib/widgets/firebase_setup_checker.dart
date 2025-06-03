@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseSetupChecker extends StatelessWidget {
   final Widget child;
-  
+
   const FirebaseSetupChecker({super.key, required this.child});
 
   @override
@@ -94,7 +94,9 @@ class FirebaseSetupChecker extends StatelessWidget {
     if (options.projectId.contains('your-project') ||
         options.apiKey.contains('your-') ||
         options.appId.contains('your-')) {
-      throw Exception('Firebase configuration contains placeholder values. Please update firebase_options.dart with your real Firebase project configuration.');
+      throw Exception(
+        'Firebase configuration contains placeholder values. Please update firebase_options.dart with your real Firebase project configuration.',
+      );
     }
 
     return true;

@@ -9,9 +9,11 @@ import 'widgets/firebase_setup_checker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     if (kDebugMode) {
       print('Firebase initialized successfully');
     }
@@ -21,7 +23,7 @@ void main() async {
       print('Please check QUICK_FIREBASE_SETUP.md for setup instructions');
     }
   }
-  
+
   runApp(const MyApp());
 }
 
@@ -48,9 +50,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const FirebaseSetupChecker(
-        child: AuthWrapper(),
-      ),
+      home: const FirebaseSetupChecker(child: AuthWrapper()),
       debugShowCheckedModeBanner: false,
     );
   }
