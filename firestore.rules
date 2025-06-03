@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Diary entries rules
+    match /diary_entries/{entryId} {
+      // Allow read/write only if the user is authenticated and owns the entry
+      allow read, write, delete: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      
+      // Allow create only if user is authenticated and sets correct userId
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId
+        && request.resource.data.title is string
+        && request.resource.data.content is string
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+    
+    // User profile rules (if you add user profiles later)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
