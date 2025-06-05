@@ -7,7 +7,6 @@ class DiaryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   static const String _collection = 'diary_entries';
-
   // Get all diary entries for current user
   Stream<List<DiaryEntry>> getDiaryEntries() {
     final userId = _auth.currentUser?.uid;
@@ -18,13 +17,16 @@ class DiaryService {
     return _firestore
         .collection(_collection)
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
+        // .orderBy('createdAt', descending: true) // Temporarily commented out until index is ready
         .snapshots()
         .map(
           (snapshot) =>
               snapshot.docs
                   .map((doc) => DiaryEntry.fromMap(doc.id, doc.data()))
-                  .toList(),
+                  .toList()
+                ..sort(
+                  (a, b) => b.createdAt.compareTo(a.createdAt),
+                ), // Sort locally instead
         );
   }
 
@@ -33,13 +35,16 @@ class DiaryService {
     return _firestore
         .collection(_collection)
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
+        // .orderBy('createdAt', descending: true) // Temporarily commented out until index is ready
         .snapshots()
         .map(
           (snapshot) =>
               snapshot.docs
                   .map((doc) => DiaryEntry.fromMap(doc.id, doc.data()))
-                  .toList(),
+                  .toList()
+                ..sort(
+                  (a, b) => b.createdAt.compareTo(a.createdAt),
+                ), // Sort locally instead
         );
   }
 
@@ -96,7 +101,9 @@ class DiaryService {
       }
       return null;
     } catch (e) {
-      print('Error getting diary entry: $e');
+      if (kDebugMode) {
+        print('Error getting diary entry: $e');
+      }
       return null;
     }
   }

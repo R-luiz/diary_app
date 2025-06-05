@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -78,15 +79,19 @@ class _LoginPageState extends State<LoginPage> {
                           label: 'Continue with Google',
                           backgroundColor: Colors.white,
                           textColor: Colors.black87,
-                        ), // GitHub Sign In Button (Available on all platforms)
-                        const SizedBox(height: 16),
-                        _buildSignInButton(
-                          onPressed: () => _signInWithGitHub(),
-                          icon: Icons.code,
-                          label: 'Continue with GitHub',
-                          backgroundColor: Colors.black87,
-                          textColor: Colors.white,
                         ),
+
+                        // GitHub Sign In Button (Web only)
+                        if (kIsWeb) ...[
+                          const SizedBox(height: 16),
+                          _buildSignInButton(
+                            onPressed: () => _signInWithGitHub(),
+                            icon: Icons.code,
+                            label: 'Continue with GitHub',
+                            backgroundColor: Colors.black87,
+                            textColor: Colors.white,
+                          ),
+                        ],
                       ],
                     ),
                   const SizedBox(height: 32),
