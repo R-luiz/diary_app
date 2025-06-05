@@ -79,19 +79,15 @@ class _LoginPageState extends State<LoginPage> {
                           label: 'Continue with Google',
                           backgroundColor: Colors.white,
                           textColor: Colors.black87,
+                        ), // GitHub Sign In Button
+                        const SizedBox(height: 16),
+                        _buildSignInButton(
+                          onPressed: () => _signInWithGitHub(),
+                          icon: Icons.code,
+                          label: 'Continue with GitHub',
+                          backgroundColor: Colors.black87,
+                          textColor: Colors.white,
                         ),
-
-                        // GitHub Sign In Button (Web only)
-                        if (kIsWeb) ...[
-                          const SizedBox(height: 16),
-                          _buildSignInButton(
-                            onPressed: () => _signInWithGitHub(),
-                            icon: Icons.code,
-                            label: 'Continue with GitHub',
-                            backgroundColor: Colors.black87,
-                            textColor: Colors.white,
-                          ),
-                        ],
                       ],
                     ),
                   const SizedBox(height: 32),

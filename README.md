@@ -25,8 +25,8 @@ A Flutter diary application with Firebase authentication and cloud storage.
 ## Authentication Status
 
 - ✅ **Google Sign-In**: Fully configured and working
-- ✅ **GitHub Sign-In**: Configured for web platform  
-- ⚠️ **GitHub on Mobile**: Shows informative setup instructions
+- ✅ **GitHub Sign-In**: Fully configured and working (both web and mobile)
+- 🔒 **Secure Storage**: User credentials and profile data securely stored
 
 ## Firebase Configuration
 

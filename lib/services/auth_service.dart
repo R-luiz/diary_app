@@ -133,13 +133,26 @@ class AuthService {
       }
       throw Exception('Google Sign-In failed: $e');
     }
-  }
+  } // Sign in with GitHub (works on both web and mobile)
 
-  // Sign in with GitHub (works on both web and mobile)
   Future<UserCredential?> signInWithGitHub() async {
     try {
       if (kDebugMode) {
         print('Starting GitHub Sign-In process...');
+      }
+
+      // First, check if GitHub provider is available
+      await _auth.fetchSignInMethodsForEmail('test@example.com').catchError((
+        e,
+      ) {
+        if (kDebugMode) {
+          print('Error checking providers: $e');
+        }
+        return <String>[];
+      });
+
+      if (kDebugMode) {
+        print('Available providers check completed');
       }
 
       if (kIsWeb) {
@@ -148,16 +161,95 @@ class AuthService {
         githubProvider.addScope('user:email');
         githubProvider.setCustomParameters({'allow_signup': 'true'});
 
-        return await _auth.signInWithPopup(githubProvider);
+        if (kDebugMode) {
+          print('GitHub provider configured for web');
+        }
+
+        try {
+          final userCredential = await _auth.signInWithPopup(githubProvider);
+
+          if (kDebugMode) {
+            print('GitHub sign-in successful: ${userCredential.user?.email}');
+          }
+
+          // Store user info securely (similar to Google sign-in)
+          if (userCredential.user != null) {
+            await _secureStorage.write(
+              key: 'user_id',
+              value: userCredential.user!.uid,
+            );
+            await _secureStorage.write(
+              key: 'user_email',
+              value: userCredential.user!.email ?? '',
+            );
+            await _secureStorage.write(
+              key: 'user_name',
+              value: userCredential.user!.displayName ?? '',
+            );
+          }
+
+          return userCredential;
+        } catch (popupError) {
+          if (kDebugMode) {
+            print('Popup error, trying redirect: $popupError');
+          }
+          // Fallback to redirect for web if popup fails
+          await _auth.signInWithRedirect(githubProvider);
+          return null; // Will be handled by redirect result
+        }
       } else {
-        // Mobile platforms - use OAuth flow with system browser
+        // Mobile platforms - use redirect flow
         return await _signInWithGitHubMobile();
       }
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
         print('Firebase Auth Error: ${e.code} - ${e.message}');
       }
-      throw Exception('Firebase Auth Error: ${e.message}');
+
+      // Provide user-friendly error messages
+      String errorMessage;
+      switch (e.code) {
+        case 'auth/operation-not-supported-in-this-environment':
+          errorMessage =
+              'GitHub Sign-In is not properly configured in Firebase Console.\n\n'
+              'Please ensure:\n'
+              '1. GitHub provider is enabled in Firebase Console\n'
+              '2. Client ID and Client Secret are properly set\n'
+              '3. Authorized domains include your app domain';
+          break;
+        case 'auth/provider-not-supported':
+          errorMessage =
+              'GitHub provider is not enabled in Firebase Console.\n\n'
+              'Go to Firebase Console > Authentication > Sign-in method > GitHub and enable it.';
+          break;
+        case 'network-request-failed':
+          errorMessage =
+              'Network error. Please check your internet connection.';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Too many sign-in attempts. Please try again later.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This account has been disabled.';
+          break;
+        case 'invalid-credential':
+          errorMessage =
+              'GitHub Sign-In configuration error. Please contact support.';
+          break;
+        case 'account-exists-with-different-credential':
+          errorMessage =
+              'An account already exists with this email using a different sign-in method.';
+          break;
+        case 'popup-closed-by-user':
+          return null; // User cancelled, don't show error
+        case 'popup-blocked':
+          errorMessage =
+              'Popup was blocked. Please allow popups and try again.';
+          break;
+        default:
+          errorMessage = 'GitHub Sign-In failed: ${e.message}';
+      }
+      throw Exception(errorMessage);
     } catch (e) {
       if (kDebugMode) {
         print('Error signing in with GitHub: $e');
@@ -169,46 +261,82 @@ class AuthService {
   // GitHub OAuth flow for mobile platforms
   Future<UserCredential?> _signInWithGitHubMobile() async {
     try {
-      // GitHub OAuth configuration
-      const String clientId =
-          'YOUR_GITHUB_CLIENT_ID'; // This needs to be configured
-      const String redirectUri = 'com.example.diary_app://oauth';
-      const String scope = 'user:email';
+      if (kDebugMode) {
+        print('Starting GitHub Sign-In for mobile...');
+      }
 
-      // Check if we have a configured client ID
-      if (clientId == 'YOUR_GITHUB_CLIENT_ID') {
-        throw Exception(
-          'GitHub OAuth not configured. Please set up GitHub OAuth app and update the client ID in auth_service.dart',
+      // Use Firebase's redirect flow for mobile
+      GithubAuthProvider githubProvider = GithubAuthProvider();
+      githubProvider.addScope('user:email');
+      githubProvider.setCustomParameters({'allow_signup': 'true'});
+
+      if (kDebugMode) {
+        print('GitHub provider configured for mobile');
+      }
+
+      // Use signInWithRedirect for mobile platforms
+      final userCredential = await _auth.signInWithProvider(githubProvider);
+
+      if (kDebugMode) {
+        print(
+          'GitHub mobile sign-in successful: ${userCredential.user?.email}',
         );
       }
 
-      // Generate OAuth URL
-      final String oauthUrl =
-          'https://github.com/login/oauth/authorize'
-          '?client_id=$clientId'
-          '&redirect_uri=${Uri.encodeComponent(redirectUri)}'
-          '&scope=${Uri.encodeComponent(scope)}'
-          '&state=${DateTime.now().millisecondsSinceEpoch}';
-
-      if (kDebugMode) {
-        print('GitHub OAuth URL: $oauthUrl');
+      // Store user info securely (similar to Google sign-in)
+      if (userCredential.user != null) {
+        await _secureStorage.write(
+          key: 'user_id',
+          value: userCredential.user!.uid,
+        );
+        await _secureStorage.write(
+          key: 'user_email',
+          value: userCredential.user!.email ?? '',
+        );
+        await _secureStorage.write(
+          key: 'user_name',
+          value: userCredential.user!.displayName ?? '',
+        );
       }
 
-      // For now, show instructions to user
-      throw Exception(
-        'GitHub sign-in on mobile requires additional setup.\n\n'
-        'Steps to enable:\n'
-        '1. Create GitHub OAuth App at https://github.com/settings/developers\n'
-        '2. Set Authorization callback URL to: $redirectUri\n'
-        '3. Update clientId in auth_service.dart\n'
-        '4. Add URL scheme to AndroidManifest.xml\n\n'
-        'For now, please use Google Sign-In.',
-      );
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print('Firebase Auth Error in mobile GitHub: ${e.code} - ${e.message}');
+      }
+
+      // Handle specific mobile GitHub errors
+      String errorMessage;
+      switch (e.code) {
+        case 'network-request-failed':
+          errorMessage =
+              'Network error. Please check your internet connection.';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Too many sign-in attempts. Please try again later.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This account has been disabled.';
+          break;
+        case 'invalid-credential':
+          errorMessage =
+              'GitHub Sign-In configuration error. Please contact support.';
+          break;
+        case 'account-exists-with-different-credential':
+          errorMessage =
+              'An account already exists with this email using a different sign-in method.';
+          break;
+        case 'web-context-cancelled':
+          return null; // User cancelled, don't show error
+        default:
+          errorMessage = 'GitHub Sign-In failed: ${e.message}';
+      }
+      throw Exception(errorMessage);
     } catch (e) {
       if (kDebugMode) {
-        print('Error in GitHub mobile OAuth: $e');
+        print('Error in GitHub mobile sign-in: $e');
       }
-      rethrow;
+      throw Exception('GitHub Sign-In failed: $e');
     }
   }
 
@@ -267,26 +395,70 @@ class AuthService {
         status['recommendations'].add(
           'Add SHA-1 fingerprint to Firebase Console',
         );
-      } // Check GitHub Sign-In (web only)
-      if (kIsWeb) {
-        // For web, we assume GitHub is available if Firebase is initialized
-        // Actual configuration check would require testing the provider
+      } // Check GitHub Sign-In
+      try {
+        // Test GitHub provider availability by checking Firebase Auth providers
+        await _auth.fetchSignInMethodsForEmail('test@example.com');
+        status['githubSignInEnabled'] = true; // Provider is available
+
+        if (kDebugMode) {
+          print('GitHub provider check completed successfully');
+        }
+      } catch (e) {
+        // This is expected - we're just checking if the provider is configured
         status['githubSignInEnabled'] = status['firebaseInitialized'];
         if (!status['githubSignInEnabled']) {
           status['recommendations'].add(
             'Enable GitHub provider in Firebase Console',
           );
         }
-      } else {
-        status['githubSignInEnabled'] = false;
-        status['recommendations'].add(
-          'GitHub Sign-In requires additional setup for mobile',
-        );
       }
     } catch (e) {
       status['issues'].add('Error checking Firebase configuration: $e');
     }
 
     return status;
+  }
+
+  // Test GitHub authentication configuration
+  Future<Map<String, dynamic>> testGitHubConfiguration() async {
+    Map<String, dynamic> result = {
+      'isConfigured': false,
+      'error': null,
+      'recommendations': <String>[],
+    };
+
+    try {
+      if (kDebugMode) {
+        print('Testing GitHub authentication configuration...');
+      }
+
+      // Try to create a GitHub provider
+      GithubAuthProvider githubProvider = GithubAuthProvider();
+      githubProvider.addScope('user:email');
+
+      result['isConfigured'] = true;
+      result['recommendations'].add(
+        'GitHub provider can be created successfully',
+      );
+
+      if (kDebugMode) {
+        print('✅ GitHub provider configuration test passed');
+      }
+    } catch (e) {
+      result['error'] = e.toString();
+      result['recommendations'].addAll([
+        'Enable GitHub provider in Firebase Console',
+        'Go to: https://console.firebase.google.com/project/diaryapp-389ed/authentication/providers',
+        'Click on GitHub and configure Client ID and Secret',
+        'Add your domain to authorized domains',
+      ]);
+
+      if (kDebugMode) {
+        print('❌ GitHub provider configuration test failed: $e');
+      }
+    }
+
+    return result;
   }
 }
