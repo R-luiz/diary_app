@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'pages/login_page.dart';
-import 'pages/diary_home_page.dart';
+import 'pages/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -222,9 +222,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
             ),
           );
         }
-
         if (snapshot.hasData && snapshot.data != null) {
-          return const DiaryHomePage();
+          return const ProfilePage();
         } else {
           return const LoginPage();
         }

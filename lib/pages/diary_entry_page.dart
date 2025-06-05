@@ -5,7 +5,7 @@ import '../services/auth_service.dart';
 
 class DiaryEntryPage extends StatefulWidget {
   final DiaryEntry? entry;
-  
+
   const DiaryEntryPage({super.key, this.entry});
 
   @override
@@ -21,12 +21,58 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
   bool _isLoading = false;
   bool get _isEditing => widget.entry != null;
 
+  String _selectedFeeling = 'neutral';
+  final List<Map<String, dynamic>> _feelings = [
+    {
+      'value': 'happy',
+      'label': 'Happy',
+      'icon': Icons.sentiment_very_satisfied,
+      'color': Colors.green,
+    },
+    {
+      'value': 'sad',
+      'label': 'Sad',
+      'icon': Icons.sentiment_very_dissatisfied,
+      'color': Colors.blue,
+    },
+    {
+      'value': 'angry',
+      'label': 'Angry',
+      'icon': Icons.sentiment_dissatisfied,
+      'color': Colors.red,
+    },
+    {
+      'value': 'excited',
+      'label': 'Excited',
+      'icon': Icons.celebration,
+      'color': Colors.orange,
+    },
+    {
+      'value': 'calm',
+      'label': 'Calm',
+      'icon': Icons.self_improvement,
+      'color': Colors.teal,
+    },
+    {
+      'value': 'stressed',
+      'label': 'Stressed',
+      'icon': Icons.psychology_alt,
+      'color': Colors.purple,
+    },
+    {
+      'value': 'neutral',
+      'label': 'Neutral',
+      'icon': Icons.sentiment_neutral,
+      'color': Colors.grey,
+    },
+  ];
   @override
   void initState() {
     super.initState();
     if (_isEditing) {
       _titleController.text = widget.entry!.title;
       _contentController.text = widget.entry!.content;
+      _selectedFeeling = widget.entry!.feeling;
     }
   }
 
@@ -90,7 +136,46 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 16),
-              
+
+              // Feeling dropdown
+              DropdownButtonFormField<String>(
+                value: _selectedFeeling,
+                decoration: const InputDecoration(
+                  labelText: 'How are you feeling?',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.sentiment_satisfied),
+                ),
+                items:
+                    _feelings.map((feeling) {
+                      return DropdownMenuItem<String>(
+                        value: feeling['value'],
+                        child: Row(
+                          children: [
+                            Icon(
+                              feeling['icon'],
+                              color: feeling['color'],
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(feeling['label']),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedFeeling = value!;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select how you\'re feeling';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
               // Content field
               Expanded(
                 child: TextFormField(
@@ -112,9 +197,9 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
                   textAlignVertical: TextAlignVertical.top,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Entry info (for editing)
               if (_isEditing)
                 Container(
@@ -161,7 +246,6 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
       final title = _titleController.text.trim();
       final content = _contentController.text.trim();
       final userId = _authService.currentUser?.uid;
-
       if (userId == null) {
         throw Exception('User not authenticated');
       }
@@ -171,10 +255,11 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
         final updatedEntry = widget.entry!.copyWith(
           title: title,
           content: content,
+          feeling: _selectedFeeling,
           updatedAt: DateTime.now(),
         );
         await _diaryService.updateDiaryEntry(updatedEntry);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -185,16 +270,19 @@ class _DiaryEntryPageState extends State<DiaryEntryPage> {
         }
       } else {
         // Create new entry
+        final userEmail = _authService.currentUser?.email ?? '';
         final newEntry = DiaryEntry(
           id: '', // Will be set by Firestore
           title: title,
           content: content,
+          feeling: _selectedFeeling,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
           userId: userId,
+          userEmail: userEmail,
         );
         await _diaryService.createDiaryEntry(newEntry);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
