@@ -41,48 +41,54 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-web-api-key',
-    appId: 'your-web-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyCXzve0XcEGYp_W0ohcnMtQez9mSuuqd0M',
+    appId: '1:60393231076:web:227ba069229e1aa24292f1',
+    messagingSenderId: '60393231076',
+    projectId: 'diaryapp-389ed',
+    authDomain: 'diaryapp-389ed.firebaseapp.com',
+    databaseURL: 'https://diaryapp-389ed-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'diaryapp-389ed.firebasestorage.app',
+    measurementId: 'G-VP76JH9W2E',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'your-android-api-key',
-    appId: 'your-android-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyBB5SUWK9ajkzcY46V4MAbZi-y7nkFvAbU',
+    appId: '1:60393231076:android:8b6d537dcb7287bf4292f1',
+    messagingSenderId: '60393231076',
+    projectId: 'diaryapp-389ed',
+    databaseURL: 'https://diaryapp-389ed-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'diaryapp-389ed.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'your-ios-api-key',
-    appId: 'your-ios-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
-    iosClientId: 'your-ios-client-id',
+    apiKey: 'AIzaSyC6PlM1mgi8BkHBlkQvaHNhkULZjcrSVGE',
+    appId: '1:60393231076:ios:99cb87a58ec447cf4292f1',
+    messagingSenderId: '60393231076',
+    projectId: 'diaryapp-389ed',
+    databaseURL: 'https://diaryapp-389ed-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'diaryapp-389ed.firebasestorage.app',
     iosBundleId: 'com.example.diaryApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'your-macos-api-key',
-    appId: 'your-macos-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
-    iosClientId: 'your-macos-client-id',
+    apiKey: 'AIzaSyC6PlM1mgi8BkHBlkQvaHNhkULZjcrSVGE',
+    appId: '1:60393231076:ios:99cb87a58ec447cf4292f1',
+    messagingSenderId: '60393231076',
+    projectId: 'diaryapp-389ed',
+    databaseURL: 'https://diaryapp-389ed-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'diaryapp-389ed.firebasestorage.app',
     iosBundleId: 'com.example.diaryApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'your-windows-api-key',
-    appId: 'your-windows-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyCXzve0XcEGYp_W0ohcnMtQez9mSuuqd0M',
+    appId: '1:60393231076:web:4802c86f35b9568f4292f1',
+    messagingSenderId: '60393231076',
+    projectId: 'diaryapp-389ed',
+    authDomain: 'diaryapp-389ed.firebaseapp.com',
+    databaseURL: 'https://diaryapp-389ed-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'diaryapp-389ed.firebasestorage.app',
+    measurementId: 'G-M8RRMXNYPN',
   );
+
 }

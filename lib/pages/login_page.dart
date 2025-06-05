@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
+import '../widgets/authentication_diagnostics.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -78,10 +80,8 @@ class _LoginPageState extends State<LoginPage> {
                           label: 'Continue with Google',
                           backgroundColor: Colors.white,
                           textColor: Colors.black87,
-                        ),
+                        ), // GitHub Sign In Button (Available on all platforms)
                         const SizedBox(height: 16),
-
-                        // GitHub Sign In Button
                         _buildSignInButton(
                           onPressed: () => _signInWithGitHub(),
                           icon: Icons.code,
@@ -91,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
-
                   const SizedBox(height: 32),
 
                   // Privacy Notice
@@ -100,6 +99,26 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 12, color: Colors.white60),
                     textAlign: TextAlign.center,
                   ),
+
+                  // Diagnostics button (only in debug mode)
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const AuthenticationDiagnostics(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.bug_report, color: Colors.white70),
+                      label: const Text(
+                        'Authentication Diagnostics',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
