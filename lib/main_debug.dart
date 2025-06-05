@@ -156,6 +156,7 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   final AuthService _authService = AuthService();
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -211,8 +212,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        // Force rebuild
-                        setState(() {});
+                        setState(() {
+                          _error = null;
+                        });
                       },
                       child: const Text('Retry'),
                     ),

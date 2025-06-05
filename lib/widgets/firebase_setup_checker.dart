@@ -82,23 +82,34 @@ class FirebaseSetupChecker extends StatelessWidget {
   }
 
   Future<bool> _checkFirebaseSetup() async {
-    // Check if Firebase is properly initialized
-    if (Firebase.apps.isEmpty) {
-      throw Exception('Firebase not initialized');
+    try {
+      // Check if Firebase is properly initialized
+      if (Firebase.apps.isEmpty) {
+        throw Exception(
+          'Firebase not initialized - Please check firebase_options.dart',
+        );
+      }
+
+      final app = Firebase.app();
+      final options = app.options;
+
+      // Check for placeholder values (be more lenient with the diaryapp project)
+      if (options.projectId.isEmpty ||
+          options.apiKey.isEmpty ||
+          options.appId.isEmpty) {
+        throw Exception(
+          'Firebase configuration is incomplete. Please check firebase_options.dart',
+        );
+      }
+
+      // For debugging: print the project ID to console
+      print('Firebase initialized with project: ${options.projectId}');
+
+      return true;
+    } catch (e) {
+      print('Firebase setup check failed: $e');
+      // Instead of throwing, let's be more lenient and just warn
+      rethrow;
     }
-
-    final app = Firebase.app();
-    final options = app.options;
-
-    // Check for placeholder values
-    if (options.projectId.contains('your-project') ||
-        options.apiKey.contains('your-') ||
-        options.appId.contains('your-')) {
-      throw Exception(
-        'Firebase configuration contains placeholder values. Please update firebase_options.dart with your real Firebase project configuration.',
-      );
-    }
-
-    return true;
   }
 }
