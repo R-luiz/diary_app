@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
+import 'debug_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -91,6 +92,26 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   const SizedBox(height: 32),
+
+                  // Debug button (only in debug mode)
+                  if (kDebugMode) ...[
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DebugPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.bug_report, color: Colors.white70),
+                      label: const Text(
+                        'Debug Configuration',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Privacy Notice
                   const Text(

@@ -204,9 +204,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
         print('Firebase Auth Error: ${e.code} - ${e.message}');
-      }
-
-      // Provide user-friendly error messages
+      } // Provide user-friendly error messages
       String errorMessage;
       switch (e.code) {
         case 'auth/operation-not-supported-in-this-environment':
@@ -221,6 +219,16 @@ class AuthService {
           errorMessage =
               'GitHub provider is not enabled in Firebase Console.\n\n'
               'Go to Firebase Console > Authentication > Sign-in method > GitHub and enable it.';
+          break;
+        case 'auth/configuration-not-found':
+        case 'auth/invalid-oauth-client-id':
+          errorMessage =
+              'GitHub OAuth configuration error.\n\n'
+              'Please check:\n'
+              '1. GitHub OAuth App is created with redirect URI:\n'
+              '   https://diaryapp-389ed.firebaseapp.com/__/auth/handler\n'
+              '2. Client ID and Secret are correctly configured in Firebase Console\n\n'
+              'See GITHUB_SETUP_GUIDE.md for detailed instructions.';
           break;
         case 'network-request-failed':
           errorMessage =
@@ -247,13 +255,39 @@ class AuthService {
               'Popup was blocked. Please allow popups and try again.';
           break;
         default:
-          errorMessage = 'GitHub Sign-In failed: ${e.message}';
+          // Check if the error message contains redirect URI information
+          if (e.message?.contains('redirect_uri') == true ||
+              e.message?.contains('not associated') == true) {
+            errorMessage =
+                'GitHub OAuth redirect URI mismatch.\n\n'
+                'The redirect URI in your GitHub OAuth App must be exactly:\n'
+                'https://diaryapp-389ed.firebaseapp.com/__/auth/handler\n\n'
+                'Please update your GitHub OAuth App settings and try again.\n'
+                'See GITHUB_SETUP_GUIDE.md for detailed instructions.';
+          } else {
+            errorMessage = 'GitHub Sign-In failed: ${e.message}';
+          }
       }
       throw Exception(errorMessage);
     } catch (e) {
       if (kDebugMode) {
         print('Error signing in with GitHub: $e');
       }
+
+      // Check for redirect URI issues in general errors
+      String errorString = e.toString().toLowerCase();
+      if (errorString.contains('redirect_uri') ||
+          errorString.contains('not associated') ||
+          errorString.contains('misconfigured')) {
+        throw Exception(
+          'GitHub OAuth redirect URI mismatch.\n\n'
+          'The redirect URI in your GitHub OAuth App must be exactly:\n'
+          'https://diaryapp-389ed.firebaseapp.com/__/auth/handler\n\n'
+          'Please update your GitHub OAuth App settings and try again.\n'
+          'See GITHUB_SETUP_GUIDE.md for detailed instructions.',
+        );
+      }
+
       throw Exception('GitHub Sign-In failed: $e');
     }
   }
