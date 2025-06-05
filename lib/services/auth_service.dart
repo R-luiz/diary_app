@@ -219,7 +219,9 @@ class AuthService {
       await _auth.signOut();
       await _secureStorage.deleteAll();
     } catch (e) {
-      print('Error signing out: $e');
+      if (kDebugMode) {
+        print('Error signing out: $e');
+      }
     }
   }
 

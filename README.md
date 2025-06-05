@@ -10,45 +10,39 @@ A Flutter diary application with Firebase authentication and cloud storage.
 - 🎨 **Beautiful UI**: Modern, intuitive interface
 - 🔒 **Secure**: Protected by Firebase Authentication
 
-## Setup Instructions
+## Quick Start
 
-### 1. Prerequisites
+1. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-- Flutter SDK installed
-- Firebase project created
-- Android Studio or VS Code with Flutter plugins
+2. **Run the App**
+   ```bash
+   flutter run
+   ```
 
-### 2. Firebase Configuration
+## Authentication Status
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or use existing one
-3. Enable Authentication with Google and GitHub providers
-4. Enable Firestore Database
-5. Add your app platforms (Android/iOS/Web)
-6. Download configuration files:
-   - `google-services.json` for Android (place in `android/app/`)
-   - `GoogleService-Info.plist` for iOS (place in `ios/Runner/`)
+- ✅ **Google Sign-In**: Fully configured and working
+- ✅ **GitHub Sign-In**: Configured for web platform  
+- ⚠️ **GitHub on Mobile**: Shows informative setup instructions
 
-### 3. Update Firebase Options
+## Firebase Configuration
 
-Replace the placeholder values in `lib/firebase_options.dart` with your actual Firebase configuration:
+The app is configured with Firebase project `diaryapp-389ed`:
+- Authentication enabled (Google & GitHub providers)
+- Firestore database enabled
+- Configuration files properly set up
+- Security rules implemented for user data isolation
 
-```dart
-// Replace these with your actual Firebase config values
-static const FirebaseOptions android = FirebaseOptions(
-  apiKey: 'your-actual-android-api-key',
-  appId: 'your-actual-android-app-id',
-  messagingSenderId: 'your-actual-sender-id',
-  projectId: 'your-actual-project-id',
-  storageBucket: 'your-actual-project-id.appspot.com',
-);
-```
+## Technical Details
 
-### 4. Install Dependencies
-
-```bash
-flutter pub get
-```
+- **Framework**: Flutter
+- **Authentication**: Firebase Auth
+- **Database**: Cloud Firestore
+- **State Management**: StreamBuilder with Firebase Auth streams
+- **Security**: User-based data isolation
 
 ### 5. Run the App
 
