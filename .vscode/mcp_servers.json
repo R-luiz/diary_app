@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "flutter-inspector": {
+      "command": "c:\\Users\\luizr\\AndroidStudioProjects\\mcp_flutter\\mcp_server_dart\\build\\flutter_inspector_mcp.exe",
+      "args": [
+        "--dart-vm-host=localhost",
+        "--dart-vm-port=8181",
+        "--no-resources",
+        "--images",
+        "--dynamics"
+      ],
+      "env": {},
+      "disabled": false
+    }
+  }
+}

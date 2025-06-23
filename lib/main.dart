@@ -1,33 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mcp_toolkit/mcp_toolkit.dart';
+import 'dart:async';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'pages/login_page.dart';
 import 'pages/profile_page.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  bool firebaseInitialized = false;
-  String? initError;
+      // Initialize MCP Toolkit
+      if (kDebugMode) {
+        try {
+          MCPToolkitBinding.instance
+            ..initialize() // Initializes the Toolkit
+            ..initializeFlutterToolkit(); // Adds Flutter related methods to the MCP server
+          print('✅ MCP Toolkit initialized successfully');
+        } catch (e) {
+          print('❌ MCP Toolkit initialization failed: $e');
+        }
+      }
 
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    firebaseInitialized = true;
-    if (kDebugMode) {
-      print('✅ Firebase initialized successfully');
-    }
-  } catch (e) {
-    initError = e.toString();
-    if (kDebugMode) {
-      print('❌ Firebase initialization failed: $e');
-    }
-  }
+      bool firebaseInitialized = false;
+      String? initError;
 
-  runApp(MyApp(firebaseInitialized: firebaseInitialized, initError: initError));
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        firebaseInitialized = true;
+        if (kDebugMode) {
+          print('✅ Firebase initialized successfully');
+        }
+      } catch (e) {
+        initError = e.toString();
+        if (kDebugMode) {
+          print('❌ Firebase initialization failed: $e');
+        }
+      }
+
+      runApp(
+        MyApp(firebaseInitialized: firebaseInitialized, initError: initError),
+      );
+    },
+    (error, stack) {
+      // Critical: Handle zone errors for MCP server error reporting
+      if (kDebugMode) {
+        MCPToolkitBinding.instance.handleZoneError(error, stack);
+      }
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {

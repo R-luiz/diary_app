@@ -1,3 +1,24 @@
 {
-    "cmake.ignoreCMakeListsMissing": true
+    "cmake.ignoreCMakeListsMissing": true,
+    "dart.flutterRunAdditionalArgs": [
+        "--debug",
+        "--host-vmservice-port=8182", 
+        "--dds-port=8181",
+        "--enable-vm-service",
+        "--disable-service-auth-codes"
+    ],
+    "mcp.servers": {
+        "flutter-inspector": {
+            "command": "c:\\Users\\luizr\\AndroidStudioProjects\\mcp_flutter\\mcp_server_dart\\build\\flutter_inspector_mcp.exe",
+            "args": [
+                "--dart-vm-host=localhost",
+                "--dart-vm-port=8181",
+                "--no-resources",
+                "--images",
+                "--dynamics"
+            ],
+            "env": {},
+            "disabled": false
+        }
+    }
 }

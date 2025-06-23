@@ -7,9 +7,23 @@
 			"command": "flutter run",
 			"group": "build",
 			"isBackground": true,
-			"problemMatcher": [
-				"$flutter"
-			]
+			"problemMatcher": []
+		},
+		{
+			"label": "Flutter: Run App with MCP Support",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"run",
+				"--debug",
+				"--host-vmservice-port=8182",
+				"--dds-port=8181",
+				"--enable-vm-service",
+				"--disable-service-auth-codes"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }
